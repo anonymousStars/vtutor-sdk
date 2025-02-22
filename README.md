@@ -2,6 +2,8 @@
 
 ## How to run?
 
-Download, then open it in browser, then embed it in iframe.
+1. Download
+2. Open it in browser,
+3. Embed it in iframe.
 
 You may want to check working example at https://codepen.io/AnonymousForReview/pen/xxvaxJg
