@@ -1,0 +1,148 @@
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Unity WebGL Player | AIToolkitTest</title>
+  <link rel="shortcut icon" href="TemplateData/favicon.ico">
+  <link rel="stylesheet" href="TemplateData/style.css">
+  <style>
+      
+      body, html {
+          margin: 0;
+          padding: 0;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+      }
+      #unity-container {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-direction: column; 
+      }
+      #unity-canvas {
+          background: transparent;
+          pointer-events: none;
+      }
+  </style>
+</head>
+<body>
+  <div id="unity-container" class="unity-desktop">
+    <canvas id="unity-canvas" tabindex="-1" style="align-items: center; width: 300px;height: 300px;/* cursor: default; */pointer-events: none;"></canvas>
+      <div id="unity-loading-bar">
+          <div id="unity-logo"></div>
+          <div id="unity-progress-bar-empty">
+              <div id="unity-progress-bar-full"></div>
+          </div>
+      </div>
+      <div id="unity-warning"></div>
+      <div id="unity-footer">
+          <div id="unity-webgl-logo"></div>
+          <div id="unity-fullscreen-button"></div>
+          <div id="unity-build-title">AIToolkitTest</div>
+      </div>
+  </div>
+
+  <div>
+      <input type="text" id="userInput" placeholder="yourInput">
+      <button id="submitButton">Submit</button>
+  </div>
+
+  <script>
+      var container = document.querySelector("#unity-container");
+      var canvas = document.querySelector("#unity-canvas");
+      var loadingBar = document.querySelector("#unity-loading-bar");
+      var progressBarFull = document.querySelector("#unity-progress-bar-full");
+      var fullscreenButton = document.querySelector("#unity-fullscreen-button");
+      var warningBanner = document.querySelector("#unity-warning");
+      var unityInstance = null; 
+
+      function unityShowBanner(msg, type) {
+          function updateBannerVisibility() {
+              warningBanner.style.display = warningBanner.children.length ? 'block' : 'none';
+          }
+          var div = document.createElement('div');
+          div.innerHTML = msg;
+          warningBanner.appendChild(div);
+          if (type == 'error') div.style = 'background: red; padding: 10px;';
+          else {
+              if (type == 'warning') div.style = 'background: yellow; padding: 10px;';
+              setTimeout(function() {
+                  warningBanner.removeChild(div);
+                  updateBannerVisibility();
+              }, 5000);
+          }
+          updateBannerVisibility();
+      }
+
+      var buildUrl = "Build";
+      var loaderUrl = buildUrl + "/Vtuber-uLipSync-SimpleA.loader.js";
+      var config = {
+          dataUrl: buildUrl + "/Vtuber-uLipSync-SimpleA.data.unityweb",
+          frameworkUrl: buildUrl + "/Vtuber-uLipSync-SimpleA.framework.js.unityweb",
+          codeUrl: buildUrl + "/Vtuber-uLipSync-SimpleA.wasm.unityweb",
+          streamingAssetsUrl: "StreamingAssets",
+          companyName: "DefaultCompany",
+          productName: "Vtuber-uLipSync-SimpleA",
+          productVersion: "0.1",
+          showBanner: unityShowBanner,
+      };
+
+      if (/iPhone|iPad|iPod|Android/i.test(navigator.userAgent)) {
+            var meta = document.createElement('meta');
+            meta.name = 'viewport';
+            meta.content = 'width=device-width, height=device-height, initial-scale=1.0, user-scalable=no, shrink-to-fit=yes';
+            document.getElementsByTagName('head')[0].appendChild(meta);
+            //container.className = "unity-mobile";
+            //canvas.className = "unity-mobile";
+        } else {
+            //canvas.style.width = "960px";
+            //canvas.style.height = "600px";
+        }
+
+        loadingBar.style.display = "block";
+
+        var script = document.createElement("script");
+        script.src = loaderUrl;
+        script.onload = () => {
+            createUnityInstance(canvas, config, (progress) => {
+                progressBarFull.style.width = 100 * progress + "%";
+            }).then((instance) => {
+                unityInstance = instance;
+                loadingBar.style.display = "none";
+                fullscreenButton.onclick = () => {
+                    unityInstance.SetFullscreen(1);
+                };
+                canvas.style.pointerEvents = "none";
+                document.getElementById("userInput").focus();
+
+                window.addEventListener('VTuber_Message_Delivery_Complete', function() {
+                    console.log('got the event');
+                });
+
+            }).catch((message) => {
+                alert(message);
+            });
+        };
+
+        document.body.appendChild(script);
+
+        document.getElementById("submitButton").addEventListener("click", function() {
+            var inputText = document.getElementById("userInput").value;
+            if (unityInstance && inputText) {
+                unityInstance.SendMessage('ChatAgent', 'ReceiveDataFromBrowser', inputText);
+                unityInstance.SendMessage('AvatarSimpleA', 'ExecuteAnimation', 'state,1');
+                //0 stands for waiting
+                //1 stands for from waiting to speaking
+                //2 stands for from speaking to thinking
+                //3 stands for from thinking to waiting
+                //4 stands for from speaking to waiting
+                //5 stands for from waiting to thinking 
+                unityInstance.SendMessage('ChatAgent','SetPlaybackSpeed', '1.1');
+                unityInstance.SendMessage('Azure','setVoice','en-US-AshleyNeural');
+                //Voice list: https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support?tabs=tts#text-to-speech
+            }
+        });
+    </script>
+</body>
+</html>

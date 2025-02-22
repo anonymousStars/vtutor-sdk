@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>VTutor | SDK</title>
+    <link rel="shortcut icon" href="TemplateData/favicon.ico" />
+    <link rel="stylesheet" href="TemplateData/style.css" />
+    <style>
+      #powered-by {
+        position: absolute;
+        bottom: 10px;
+        right: 10px;
+        color: white;
+        font-size: 14px;
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 5px 10px;
+        border-radius: 5px;
+      }
+
+      /* Fullscreen parent div */
+      #unity-parent {
+        position: fixed;
+        top: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden; /* Prevent content from overflowing */
+      }
+
+      #unity-container {
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        height: 100%;
+      }
+
+      #unity-canvas {
+        background: transparent;
+        pointer-events: none;
+        display: block;
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Fullscreen parent div -->
+    <div id="unity-parent">
+      <div id="unity-container">
+        <canvas id="unity-canvas" tabindex="-1" style="display: none"></canvas>
+        <div id="unity-loading-bar" style="display: none">
+          <div id="unity-logo"></div>
+          <div id="unity-progress-bar-empty">
+            <div id="unity-progress-bar-full"></div>
+          </div>
+        </div>
+        <div id="unity-warning" style="display: none"></div>
+        <div id="unity-footer" style="display: none">
+          <div id="unity-webgl-logo"></div>
+          <div id="unity-fullscreen-button"></div>
+          <div id="unity-build-title">AIToolkitTest</div>
+        </div>
+
+        <!-- Add this new div for the Powered by MuFIN text -->
+        <div id="powered-by" style="display: none">Powered by MuFIN</div>
+      </div>
+    </div>
+
+    <script src="script/loader.js"></script>
+    <script src="script/speakHandler.js"></script>
+    <script src="script/test.js"></script>
+  </body>
+</html>
